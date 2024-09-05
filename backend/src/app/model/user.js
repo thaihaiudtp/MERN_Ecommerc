@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const bcrypt = require('bcrypt')
 const CryptoJs = require('crypto-js')
+const softDelete = require('mongoose-delete')
 const UserSchema = new Schema({
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
@@ -15,7 +16,7 @@ const UserSchema = new Schema({
 }, {
     timestamps: true
 })
-
+UserSchema.plugin(softDelete, {deletedAt: true})
 UserSchema.pre('save', async function (next) {
     if(!this.isModified('password')){
         return next()

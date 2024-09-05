@@ -9,4 +9,8 @@ router.get('/getOne', verifyToken.verifyToken, userController.getOne)
 router.post('/resetAccessToken', userController.resetAccessToken)
 router.get('/forgetPassword', userController.forgetPassword)
 router.put('/changePassword', userController.changePassword)
+router.get('/getall', verifyToken.verifyTokenAdmin, userController.getAllUser)
+router.put('/update', verifyToken.verifyToken, userController.updateUser)
+router.delete('/delete', verifyToken.verifyToken, userController.softDelete)
+router.get('/getall/deleted', verifyToken.verifyTokenAdmin, userController.getAllUserDeleted)
 module.exports = router

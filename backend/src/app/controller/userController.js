@@ -129,5 +129,43 @@ class UserController {
             })
         }
     }
+    async getAllUser(req, res){
+        const users = await User.find({role: "user", deleted: false}).select("-password -deleted")
+        return res.status(200).json({
+            success: users ? true : false,
+            rs: users
+        })
+    }
+    async getAllUserDeleted(req, res){
+        const users = await User.find({deleted: true}).select("-password")
+        return res.status(200).json({
+            success: users ? true : false,
+            rs: users
+        })
+    }
+    async updateUser(req, res){
+        const {_id} = req.user
+        if(!_id || Object.keys(req.body).length === 0){
+            return res.status(400).json({message: "invalid request!"})
+        } else {
+            const users = await User.findByIdAndUpdate(_id, req.body, {new: true}).select("-password -role -refreshToken")
+            return res.status(200).json({
+                success: users ? true : false,
+                rs: users
+            })
+        }
+    }
+    async softDelete(req, res){
+        const {_id} = req.user
+        if(!_id){
+            return res.status(400).json({message: "invalid request!"})
+        } else {
+            const userDelete = await User.delete({_id: _id})
+            return res.status(200).json({
+                success: userDelete ? true : false,
+                message: "Thành công!!!"
+            })
+        }
+    }
 }
 module.exports = new UserController

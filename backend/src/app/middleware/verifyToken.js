@@ -8,6 +8,7 @@ class VerifyToken {
             return res.status(401).json({ message: "Access Token is missing" })
         } else {
             jwt.verify(token, process.env.JWT_SECRET, function(err, decode){
+                console.log(decode)
                 if(err) {
                     return res.status(401).json({message: "Invalid Token"})
                 }
@@ -15,7 +16,25 @@ class VerifyToken {
                 next()
             })
         }
-
+    }
+    async verifyTokenAdmin(req, res, next){
+        const token = req.header('Authorization').replace('Bearer ', '')
+        if(!token){
+            return res.status(401).json({ message: "Access Token is missing" })
+        } else {
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decode){
+                console.log(decode)
+                if(err){
+                    return res.status(401).json({message: "Invalid Token"})
+                } 
+                if(decode.role !== "admin") {
+                    return res.status(403).json({message: "You are not an admin"})
+                } else {
+                    req.user = decode
+                    next()
+                }
+            })
+        }
     }
 }
 module.exports = new VerifyToken
