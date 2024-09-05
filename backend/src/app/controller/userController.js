@@ -1,7 +1,9 @@
 const User = require('../model/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const CryptoJs = require('crypto-js')
 const {genAccessToken, genRefreshToken} = require('../middleware/jwt')
+const sendMail = require('../ultil/sendMail')
 class UserController {
     //ĐĂNG KÝ [POST] /user/register
     async userRegister(req, res){
@@ -19,7 +21,7 @@ class UserController {
         } catch (error) {
             console.log(error)
             return res.status(500).json({
-                message: error
+                message: "tài khoản tồn tại"
             })
         }
     }
@@ -45,6 +47,86 @@ class UserController {
         } catch (error) {
             res.status(404).json({error: 'ERROR!!!'})
             console.log(error)
+        }
+    }
+    async getOne(req, res) {
+        const {_id} = req.user
+        const user = await User.findById(_id).select('-password -role -refreshtoken')
+        return res.status(200).json({
+            success: user ? true : false,
+            result: user
+        })
+    }
+    async resetAccessToken(req, res){ //Lấy refresh từ cookie, so sánh với refreshToken đươc lưu ở db
+        const cookie = req.cookies
+        if(!cookie || !cookie.refreshToken){
+            return res.status(403).json({message: "refresh token is missing!"})
+        } else {
+            const result = jwt.verify(cookie.refreshToken, process.env.JWT_SECRET)
+            const response = await User.findOne({_id: result._id}, {refreshToken: cookie.refreshToken})
+            if(!response){
+                return res.status(403).json({message: "refresh token is invalid!"})
+            } else {
+                const newAccessToken = await genAccessToken(result._id, result.role)
+                return res.status(200).json({
+                    message: "access token is generated successfully",
+                    newAccessToken
+                })
+            }
+        }
+    }
+    async logout(req, res) { //Lấy refresh từ cookie sau đó xóa trong db và cookie
+        const cookie = req.cookies
+        if(!cookie || !cookie.refreshToken){
+            return res.status(403).json({message: "refresh token is missing!"})
+        } else {
+            await User.findOneAndUpdate({refreshToken: cookie.refreshToken}, {refreshToken: ""}, {new: true})
+            res.clearCookie('refreshToken', {httpOnly: true, security: true})
+            return res.status(200).json({
+                message: "logout successfully"
+            })
+        }
+    }
+    async forgetPassword(req, res){
+        const {email} = req.query
+        if(!email){
+            return res.status(400).json({message: "email is missing!"})
+        } else {
+            const user = await User.findOne({email})
+            if(!user){
+                return res.status(404).json({message: "user not found!"})
+            } else {
+                const resetToken = user.resetPassword()
+                await user.save()
+                const html = `Click vào link để đổi mật khẩu. Link sẽ hết hạn sau 10 phút. <a href=${process.env.URL_SERVER}/user/resetpass/${resetToken}>Click</a>`
+                const data = {
+                    email, html
+                }
+                const rs = await sendMail(data)
+                return res.status(200).json({
+                    rs
+                })
+            }
+        }
+    }
+    async changePassword(req, res){
+      
+        const {password, resetToken} = req.body
+        const passwordResetToken = CryptoJs.SHA256(resetToken).toString(CryptoJs.enc.Hex)
+        const user = await User.findOne({passwordResetToken, passwordResetExpires: {$gt: Date.now()}})
+        if(!user){
+            throw new Error("error");
+        } else {
+            user.passwordResetToken = undefined
+            
+            user.passwordChangedAt= Date.now()
+            user.password = password
+            user.passwordResetExpires = undefined
+            await user.save()
+            return res.status(200).json({
+                success: user ? true:false,
+                message: "change password successfully"
+            })
         }
     }
 }

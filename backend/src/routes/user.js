@@ -1,6 +1,12 @@
 const express = require('express')
 const router = express.Router()
 const userController = require('../app/controller/userController')
+const verifyToken = require('../app/middleware/verifyToken')
 router.post('/register', userController.userRegister)
 router.post('/login', userController.userLogin)
+router.put('/logout', userController.logout)
+router.get('/getOne', verifyToken.verifyToken, userController.getOne)
+router.post('/resetAccessToken', userController.resetAccessToken)
+router.get('/forgetPassword', userController.forgetPassword)
+router.put('/changePassword', userController.changePassword)
 module.exports = router

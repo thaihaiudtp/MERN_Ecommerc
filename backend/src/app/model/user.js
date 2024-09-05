@@ -1,13 +1,14 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const bcrypt = require('bcrypt')
+const CryptoJs = require('crypto-js')
 const UserSchema = new Schema({
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
     name: {type: String, required: true},
     role: {type: String, default: 'user'},
     telephone: {type: String, default: null},
-    passwordChangedAt: {type: String},
+    passwordChangedAt: {type: Date},
     passwordResetToken: {type: String},
     passwordResetExpires: {type: String},
     refreshToken: {type: String}
@@ -15,12 +16,21 @@ const UserSchema = new Schema({
     timestamps: true
 })
 
-UserSchema.pre('save', async function next() {
+UserSchema.pre('save', async function (next) {
     if(!this.isModified('password')){
-        next()
+        return next()
     }
     const saltRound = bcrypt.genSaltSync(10)
     this.password = await bcrypt.hash(this.password ,saltRound)
+    next()
 })
+
+UserSchema.methods.resetPassword = function(){
+    console.log('ok')
+    const resetToken = CryptoJs.lib.WordArray.random(32).toString(CryptoJs.enc.Hex)
+    this.passwordResetToken = CryptoJs.SHA256(resetToken).toString(CryptoJs.enc.Hex)
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000
+    return resetToken
+}
 
 module.exports = mongoose.model('user', UserSchema)

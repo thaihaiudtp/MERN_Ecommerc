@@ -3,7 +3,7 @@ const genAccessToken = (id, role) => jwt.sign(
     {_id: id, role},
     process.env.JWT_SECRET,
     {
-        expiresIn: "60s"
+        expiresIn: "3d"
     }
 )
 
