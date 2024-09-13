@@ -9,6 +9,10 @@ const UserSchema = new Schema({
     name: {type: String, required: true},
     role: {type: String, default: 'user'},
     telephone: {type: String, default: null},
+    address: {
+        type: Array,
+        default: []
+    },
     passwordChangedAt: {type: Date},
     passwordResetToken: {type: String},
     passwordResetExpires: {type: String},

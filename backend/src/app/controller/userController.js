@@ -167,5 +167,14 @@ class UserController {
             })
         }
     }
+    async updateUserAddress(req, res){
+        const {_id} = req.user
+        if(!req.body.address) throw new Error("missing input")
+        const update = await User.findByIdAndUpdate(_id, {$push: {address: req.body.address}}, {new: true})
+        return res.status(200).json({
+            success: update ? true : false,
+            rs: update
+        })
+    }
 }
 module.exports = new UserController

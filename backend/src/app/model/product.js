@@ -8,10 +8,10 @@ const ProductSchema = new Schema({
     slug: {type: String, slug: "title", unique: true},
     price: {type: Number, required: true},
     brand: {type: String, required: true},
-    category: {type: mongoose.Types.ObjectId, ref: "Category"},
+    category: {type: mongoose.Types.ObjectId, ref: "category"},
     quantity: {type: Number, default: 0},
     sold: {type:Number, default: 0},
-    image: {type:String, required: true}
+    image: {type:Array}
 }, {
     timestamps: true
 })

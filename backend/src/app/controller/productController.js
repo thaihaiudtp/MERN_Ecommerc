@@ -86,5 +86,15 @@ class ProductController {
             message: products
         })
     }
+    async uploadImage(req, res){
+        console.log(req.files)
+        const {pid} = req.params
+        if(!req.files) throw new Error("missing file")
+        const upload = await Product.findByIdAndUpdate(pid, {$push: {image: {$each: req.files.map(el => el.path)}}}, {new: true})
+        return res.status(200).json({
+            success: upload ? true : false,
+            message: upload
+        })
+    }
 }
 module.exports = new ProductController
