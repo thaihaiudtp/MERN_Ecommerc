@@ -5,9 +5,10 @@ const blogController = require('../app/controller/blogController')
 const uploaded = require('../config/cloudinary.config')
 route.post('/create', verifyToken.verifyTokenAdmin, blogController.create)
 route.put('/update/:bid', verifyToken.verifyTokenAdmin, blogController.update)
-route.get('/getall', blogController.getall)
+
 route.put('/like/:bid', verifyToken.verifyToken, blogController.likeBlog)
 route.delete('/delete/:bid', verifyToken.verifyTokenAdmin, blogController.delete)
 route.get('/:bid', blogController.getBlog)
 route.put('/uploadImage/:bid', verifyToken.verifyTokenAdmin, uploaded.single('image'), blogController.uploadImage)
+route.get('/', blogController.getall)
 module.exports = route

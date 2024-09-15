@@ -176,5 +176,29 @@ class UserController {
             rs: update
         })
     }
+    async updateUserCart(req, res){
+        const {_id} = req.user
+        const {pid, quantity, color} = req.body
+        if(!pid || !quantity ||!color) throw new Error("missing input")
+        try {
+            const user = await User.findById(_id).select('cart')
+            const alreadyCart = user?.cart?.find(el => el.product.toString() === pid && el.color===color)
+            if(alreadyCart){
+                alreadyCart.quantity += Number(quantity)
+            } else {
+                user.cart.push({product: pid, quantity: quantity, color: color})
+            }
+            const updateCart = await user.save()
+            return res.status(200).json({
+                success: updateCart ? true : false,
+                rs: updateCart
+            })
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: error.message
+            })
+        }
+    }
 }
 module.exports = new UserController

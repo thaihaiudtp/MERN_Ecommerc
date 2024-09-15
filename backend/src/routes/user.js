@@ -12,6 +12,7 @@ router.put('/changePassword', userController.changePassword)
 router.get('/getall', verifyToken.verifyTokenAdmin, userController.getAllUser)
 router.put('/update', verifyToken.verifyToken, userController.updateUser)
 router.delete('/delete', verifyToken.verifyToken, userController.softDelete)
-router.put('/address/:_id', verifyToken.verifyToken, userController.updateUserAddress)
+router.put('/address', verifyToken.verifyToken, userController.updateUserAddress)
+router.put('/cart', verifyToken.verifyToken, userController.updateUserCart)
 router.get('/getall/deleted', verifyToken.verifyTokenAdmin, userController.getAllUserDeleted)
 module.exports = router

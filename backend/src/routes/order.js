@@ -1,0 +1,11 @@
+const express = require('express')
+const route = express.Router()
+const verifyToken = require('../app/middleware/verifyToken')
+const orderController = require('../app/controller/orderController')
+route.put('/status/:oid', verifyToken.verifyTokenAdmin, orderController.updateStatus)
+route.put('/cancelcoupon/:oid', verifyToken.verifyToken, orderController.cancelCoupon)
+route.put('/addcoupon/:oid', verifyToken.verifyToken, orderController.addCoupopn)
+route.get('/orders', verifyToken.verifyTokenAdmin, orderController.getOrders)
+route.get('/order/:uid', verifyToken.verifyToken, orderController.getUserOrder)
+route.post('/', verifyToken.verifyToken, orderController.createOrder)
+module.exports = route
