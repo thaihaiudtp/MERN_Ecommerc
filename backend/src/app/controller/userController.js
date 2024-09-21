@@ -31,22 +31,24 @@ class UserController {
             const email = req.body.email
             const isUser = await User.findOne({email})
             if(!isUser){
-                res.send('user not found')
+                return res.status(404).json({ message: 'User not found' })
             } else {
                 const isPassword = await bcrypt.compare(req.body.password, isUser.password)
                 if(isPassword){
-                    const AccessToken = genAccessToken(isUser._id, isUser.role)
+                    const AccessToken = genAccessToken(isUser._id, isUser.role, isUser.name)
                     const RefreshToken = genRefreshToken(isUser._id)
                     await User.findByIdAndUpdate(isUser._id, {refreshToken: RefreshToken}, {new: true})
                     res.cookie('refreshToken', RefreshToken, {httpOnly: true, maxAge: 10*24*60*60*1000})
-                    res.json({isUser, AccessToken})
+                    res.json({isUser, AccessToken, isLogin: 'true'})
                 } else {
                     res.send('password is incorrect')
                 }
             }
         } catch (error) {
-            res.status(404).json({error: 'ERROR!!!'})
-            console.log(error)
+            return res.status(500).json({
+                message: "Không có tài khoản"
+            })
+            
         }
     }
     async getOne(req, res) {

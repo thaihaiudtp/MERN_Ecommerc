@@ -34,7 +34,7 @@ class ProductController {
             query.deleted = false
     
             // Thực hiện truy vấn
-            let queryCommand = Product.find(query)
+            let queryCommand = Product.find(query).select('-deleted -createdAt -updatedAt')
     
             // Sort (nếu có yêu cầu sắp xếp)
             if (req.query.sort) {
@@ -87,13 +87,21 @@ class ProductController {
         })
     }
     async uploadImage(req, res){
-        console.log(req.files)
+        console.log(req.file)
         const {pid} = req.params
-        if(!req.files) throw new Error("missing file")
-        const upload = await Product.findByIdAndUpdate(pid, {$push: {image: {$each: req.files.map(el => el.path)}}}, {new: true})
+        if(!req.file) throw new Error("missing file")
+        const upload = await Product.findByIdAndUpdate(pid, {image: req.file.path}, {new: true})
         return res.status(200).json({
             success: upload ? true : false,
             message: upload
+        })
+    }
+    async getone(req, res){
+        const {pid} = req.params
+        const product = await Product.findById(pid)
+        return res.status(200).json({
+            success: product ? true : false,
+            message: product
         })
     }
 }
