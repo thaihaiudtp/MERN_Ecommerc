@@ -2,12 +2,19 @@
 import {Show} from '@/apis/products'
 import { useEffect } from 'react';
 import { useState } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 export default function Home() {
+  
   const[product, setProduct] = useState<Product[]>([]);
+  
+  const searchParams = useSearchParams()
+  const title = searchParams.get('title')
+  const categoryId = searchParams.get('categoryId')
   useEffect(()=>{
     const getProduct = async ()=>{
       try {
-        const data = await Show()
+        const data = await Show({ title: title || undefined, categoryId })
         
         console.log(data)
         setProduct(data)
@@ -16,12 +23,14 @@ export default function Home() {
       }
     }
     getProduct()
-  }, [])
+    
+  }, [title, categoryId])
   if (!product.length) return <div>Loading...</div>
   return (
-    <div className="font-[sans-serif] mx-auto lg:max-w-6xl max-h-80 z-1 py-4 mt-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6   ml-14 mt-10">
+    <div className="font-[sans-serif] mx-auto lg:max-w-6xl max-h-80 z-1 py-4 mt-10 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ml-14 mt-10 mb-4">
         {product.map((products)=>(
+                <Link key={products._id} href={`/product/${products.slug}`}>
                   <div key = {products._id} className="bg-gray-200 rounded-xl cursor-pointer hover:scale-[1.03] transition-all relative overflow-hidden">
                   <div className="p-6">
                     <div className="bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full cursor-pointer absolute top-4 right-4">
@@ -47,9 +56,10 @@ export default function Home() {
                           d="M164.96 300.004h.024c.02 0 .04-.004.059-.004H437a15.003 15.003 0 0 0 14.422-10.879l60-210a15.003 15.003 0 0 0-2.445-13.152A15.006 15.006 0 0 0 497 60H130.367l-10.722-48.254A15.003 15.003 0 0 0 105 0H15C6.715 0 0 6.715 0 15s6.715 15 15 15h77.969c1.898 8.55 51.312 230.918 54.156 243.71C131.184 280.64 120 296.536 120 315c0 24.812 20.188 45 45 45h272c8.285 0 15-6.715 15-15s-6.715-15-15-15H165c-8.27 0-15-6.73-15-15 0-8.258 6.707-14.977 14.96-14.996zM477.114 90l-51.43 180H177.032l-40-180zM150 405c0 24.813 20.188 45 45 45s45-20.188 45-45-20.188-45-45-45-45 20.188-45 45zm45-15c8.27 0 15 6.73 15 15s-6.73 15-15 15-15-6.73-15-15 6.73-15 15-15zm167 15c0 24.813 20.188 45 45 45s45-20.188 45-45-20.188-45-45-45-45 20.188-45 45zm45-15c8.27 0 15 6.73 15 15s-6.73 15-15 15-15-6.73-15-15 6.73-15 15-15zm0 0"
                           data-original="#000000"></path>
                       </svg>
-                      Add to cart</button>
+                      View</button>
                   </div>
                 </div>
+                </Link>
         ))}
       </div>
     </div>
@@ -63,4 +73,5 @@ interface Product {
   price: number;
   brand: string;
   image: string;
+  slug: string;
 }

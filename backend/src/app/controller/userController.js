@@ -37,9 +37,16 @@ class UserController {
                 if(isPassword){
                     const AccessToken = genAccessToken(isUser._id, isUser.role, isUser.name)
                     const RefreshToken = genRefreshToken(isUser._id)
-                    await User.findByIdAndUpdate(isUser._id, {refreshToken: RefreshToken}, {new: true})
-                    res.cookie('refreshToken', RefreshToken, {httpOnly: true, maxAge: 10*24*60*60*1000})
-                    res.json({isUser, AccessToken, isLogin: 'true'})
+                    const update = await User.findByIdAndUpdate(isUser._id, {refreshToken: RefreshToken}, {new: true})
+                    res.cookie('refreshToken', RefreshToken, {httpOnly: true, maxAge: 10*24*60*60*1000, sameSite: 'Lax'})
+                    console.log('Refresh Token Set:', RefreshToken);
+                    res.set({
+                        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    });
+                    
+                    res.json({update, AccessToken, isLogin: 'true'})
                 } else {
                     res.send('password is incorrect')
                 }
@@ -78,13 +85,18 @@ class UserController {
         }
     }
     async logout(req, res) { //Lấy refresh từ cookie sau đó xóa trong db và cookie
+        console.log("Logout called");
         const cookie = req.cookies
+        console.log(cookie);
+        console.log(cookie.refreshToken);
         if(!cookie || !cookie.refreshToken){
+            console.log("No refresh token")
             return res.status(403).json({message: "refresh token is missing!"})
         } else {
             await User.findOneAndUpdate({refreshToken: cookie.refreshToken}, {refreshToken: ""}, {new: true})
             res.clearCookie('refreshToken', {httpOnly: true, security: true})
             return res.status(200).json({
+                
                 message: "logout successfully"
             })
         }
@@ -100,13 +112,13 @@ class UserController {
             } else {
                 const resetToken = user.resetPassword()
                 await user.save()
-                const html = `Click vào link để đổi mật khẩu. Link sẽ hết hạn sau 10 phút. <a href=${process.env.URL_SERVER}/user/resetpass/${resetToken}>Click</a>`
+                const html = `Click vào link để đổi mật khẩu. Link sẽ hết hạn sau 10 phút. <a href=${process.env.URL_SERVER}/login/resetpass/${resetToken}>Click</a>`
                 const data = {
                     email, html
                 }
                 const rs = await sendMail(data)
                 return res.status(200).json({
-                    rs
+                    rs, resetToken
                 })
             }
         }
@@ -115,9 +127,12 @@ class UserController {
       
         const {password, resetToken} = req.body
         const passwordResetToken = CryptoJs.SHA256(resetToken).toString(CryptoJs.enc.Hex)
+        console.log(passwordResetToken )
         const user = await User.findOne({passwordResetToken, passwordResetExpires: {$gt: Date.now()}})
+        console.log(user)
         if(!user){
-            throw new Error("error");
+            return res.status(500).json({
+                message: 'Không có user'})
         } else {
             user.passwordResetToken = undefined
             

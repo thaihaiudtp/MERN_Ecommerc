@@ -1,17 +1,25 @@
 'use client'
+
 import LoginUser from "@/apis/user/login"
-import React, { useState } from "react"
+import  { useState, useContext, useEffect} from "react"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { AuthContext } from "@/context/AuthContext"
+
 export default function Login(){
-   
-    const router = useRouter()
-    const [isLogin, setIsLogin] = useState(false)
+    const {isAuth, setIsAuth, setUser} = useContext(AuthContext);
+    const[successmes, setSuccessmes] = useState('');
+    const router = useRouter();
+    //const [isLogin, setIsLogin] =useState(false)
     const[form, setForm] = useState({
         email: '',
         password: '',
     });
     const[error, setError] = useState('');
+    useEffect(()=>{
+      if(isAuth){
+        router.push('/')
+      }
+    }, [isAuth])
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target
         setForm((prev)=>({
@@ -22,22 +30,32 @@ export default function Login(){
     const handleFormSubmit = async (e:React.FormEvent)=>{
         e.preventDefault()
         setError('')
+        setSuccessmes('')
         try {
             const data = await LoginUser(form.email, form.password);
             console.log(data)
-            if(data){
-                setIsLogin(true)
-                setForm(data)
-                router.push("/")
+            if(data.isLogin === "true"){
+
+                setIsAuth(true)
+                setUser(data.update)
+                setForm({ email: '', password: '' })
+                setSuccessmes('Đăng nhập thành công')
+                
+                router.push('/')
             } else {
                 setError(data.message || "Có lỗi xảy ra, vui lòng thử lại.");
+                alert("Sai mật khẩu")
+                
             }
         } catch (error) {
             setError('có lỗi xảy ra');
+            alert("Sai email")
+            
         }
     }
 
     return (
+      
         <div className="font-[sans-serif] bg-slate-950">
       <div className="min-h-screen flex flex-col items-center justify-center">
         <div className=" bg-white grid md:grid-cols-2 items-center gap-4 max-md:gap-8 max-w-6xl max-md:max-w-lg w-full p-4 m-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-md">
@@ -45,7 +63,7 @@ export default function Login(){
             <form onSubmit={handleFormSubmit}>
               <div className="mb-12">
                 <h3 className="text-gray-800 text-3xl font-extrabold">Sign in</h3>
-                <p className="text-sm mt-4 text-gray-800">Don't have an account <a href="#" className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">Register here</a></p>
+                <p className="text-sm mt-4 text-gray-800">Don't have an account <a href="/signup" className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">Register here</a></p>
               </div>
 
               <div>
@@ -69,7 +87,7 @@ export default function Login(){
               <div className="mt-8">
                 <label className="text-gray-800 text-xs block mb-2">Password</label>
                 <div className="relative flex items-center">
-                  <input value={form.password}onChange={handleInputChange} name="password" type="password" required className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 px-2 py-3 outline-none" placeholder="Enter password" />
+                  <input value={form.password} onChange={handleInputChange} name="password" type="password" required className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 px-2 py-3 outline-none" placeholder="Enter password" />
                   <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" className="w-[18px] h-[18px] absolute right-2 cursor-pointer" viewBox="0 0 128 128">
                     <path d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z" data-original="#000000"></path>
                   </svg>
@@ -84,12 +102,12 @@ export default function Login(){
                   </label>
                 </div>
                 <div>
-                  <a href="#" className="text-blue-600 font-semibold text-sm hover:underline">
+                  <a href="/login/changepass" className="text-blue-600 font-semibold text-sm hover:underline">
                     Forgot Password?
                   </a>
                 </div>
               </div>
-
+              {successmes && <p className="text-green-500">{successmes}</p>}
               <div className="mt-12">
                 <button type="submit" className="w-full shadow-xl py-2.5 px-4 text-sm tracking-wide rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
                   Sign in

@@ -97,8 +97,8 @@ class ProductController {
         })
     }
     async getone(req, res){
-        const {pid} = req.params
-        const product = await Product.findById(pid)
+        const {slug} = req.params
+        const product = await Product.findOne({slug})
         return res.status(200).json({
             success: product ? true : false,
             message: product

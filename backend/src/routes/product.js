@@ -6,7 +6,7 @@ const route = express.Router()
 
 route.post('/create', verifyToken.verifyTokenAdmin, productController.create)
 route.get('/getall', productController.getall)
-route.get('/getone/:pid', productController.getone)
+route.get('/getone/:slug', productController.getone)
 route.get('/getdeleted',verifyToken.verifyTokenAdmin, productController.getdeleted)
 route.put('/update/:pid', verifyToken.verifyTokenAdmin, productController.update)
 route.delete('/delete/:pid', verifyToken.verifyTokenAdmin, productController.delete)

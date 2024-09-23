@@ -1,8 +1,10 @@
 'use client'
 import SignUp from "@/apis/user/signup"
-import React, { useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import {useRouter} from "next/navigation";
+import { AuthContext } from "@/context/AuthContext";
 export default function Signup(){
+    const {isAuth} = useContext(AuthContext);
     const router = useRouter()
     const[form, setForm] = useState({
         name: '',
@@ -11,6 +13,11 @@ export default function Signup(){
     });
     const[error, setError] = useState('');
     const[successmes, setSuccessmes] = useState('');
+    useEffect(()=>{
+      if(isAuth){
+        router.push('/')
+      }
+    }, [isAuth])
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target
         setForm((prev)=>({
@@ -98,7 +105,7 @@ export default function Signup(){
                 <button type="submit" className="w-max shadow-xl py-3 px-6 text-sm text-gray-800 font-semibold rounded-md bg-transparent bg-yellow-400 hover:bg-yellow-500 focus:outline-none">
                   Register
                 </button>
-                <p className="text-sm text-white mt-8">Already have an account? <a href="#" className="text-yellow-400 font-semibold hover:underline ml-1">Login here</a></p>
+                <p className="text-sm text-white mt-8">Already have an account? <a href="/login" className="text-yellow-400 font-semibold hover:underline ml-1">Login here</a></p>
               </div>
             </form>
           </div>

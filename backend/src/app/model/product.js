@@ -11,7 +11,8 @@ const ProductSchema = new Schema({
     category: {type: mongoose.Types.ObjectId, ref: "category"},
     quantity: {type: Number, default: 0},
     sold: {type:Number, default: 0},
-    image: {type:String}
+    image: {type:String},
+    categoryId: {type:Number, enum:[1,2,3,4], required: true}  // 1 là bike, 2 là Computer, 3 là Phone, 4 là Clock
 }, {
     timestamps: true
 })
