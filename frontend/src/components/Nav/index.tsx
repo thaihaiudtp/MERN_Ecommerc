@@ -57,7 +57,7 @@ export default function Sidebar(){
         </li>
 
         <li>
-          <a href="#"
+          <a href="/cart"
             className="text-gray-300 hover:text-white text-sm flex items-center hover:bg-gray-900 rounded px-4 py-3 transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-[18px] h-[18px] mr-4"
             viewBox="0 0 512 512">
@@ -87,7 +87,7 @@ export default function Sidebar(){
           <ul className="space-y-3">
 
           <li>
-            <a href="#"
+            <a href="/profile"
               className="text-gray-300 hover:text-white text-sm flex items-center hover:bg-gray-900 rounded px-4 py-3 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-[18px] h-[18px] mr-4"
                 viewBox="0 0 512 512">

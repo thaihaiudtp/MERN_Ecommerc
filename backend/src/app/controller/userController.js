@@ -60,7 +60,7 @@ class UserController {
     }
     async getOne(req, res) {
         const {_id} = req.user
-        const user = await User.findById(_id).select('-password -role -refreshtoken')
+        const user = await User.findById(_id).select('-password -role -refreshtoken -deleted -createdAt -updatedAt')
         return res.status(200).json({
             success: user ? true : false,
             result: user

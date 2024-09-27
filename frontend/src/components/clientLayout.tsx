@@ -14,12 +14,14 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const isSignupPage = pathname === "/signup";
     const isLoginPage = pathname.startsWith("/login");
     const isProductInfo = pathname.startsWith("/product");
-    const isRenderSidebar = !(isLoginPage || isProductInfo || isSignupPage);
+    const isProfile = pathname.startsWith("/profile");
+    const isCart = pathname.startsWith("/cart");
+    const isRenderSidebar = !(isLoginPage || isProductInfo || isSignupPage || isProfile || isCart);
   return (
     <div className="flex flex-col min-h-screen">
       {/* Chỉ render Header và Sidebar nếu không phải trang /signup */}
       {isRenderSidebar && <Sidebar />}
-      {!isSignupPage && !isLoginPage && <Header />}
+      {!isSignupPage && !isLoginPage && !isCart&&<Header />}
       
       
       {children}
