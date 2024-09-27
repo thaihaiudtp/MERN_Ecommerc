@@ -45,19 +45,21 @@ export const AuthProvider = ({ children }: AuthProviderProp) => {
       if (token) {
         try {
           const decode = jwtDecode(token);
+          console.log(decode)
           if (decode && decode.exp) {
             const currentTime = Date.now() / 1000; // Thời gian hiện tại tính bằng giây
             if (decode.exp < currentTime) {
               Cookies.remove('AccessToken');
-              Cookies.remove('User')
+              //Cookies.remove('User')
               setIsAuth(false);
               setUser(null);
               alert("Phiên đăng nhập hết hạn");
             } else {
               setIsAuth(true);
+              //setUser(decode.name)
+              
               const dataUser: any = Cookies.get('User');
               console.log("Raw cookie data:", dataUser);
-              
               if(dataUser){
                 try {
                   const parsedUser = JSON.parse(dataUser);
@@ -69,7 +71,7 @@ export const AuthProvider = ({ children }: AuthProviderProp) => {
               } else {
                 console.log("No user data found in cookies");
               }
-              
+             
             }
           }
         } catch (error) {

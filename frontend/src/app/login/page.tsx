@@ -4,7 +4,7 @@ import LoginUser from "@/apis/user/login"
 import  { useState, useContext, useEffect} from "react"
 import { useRouter } from "next/navigation"
 import { AuthContext } from "@/context/AuthContext"
-
+import Cookies from "js-cookie"
 export default function Login(){
     const {isAuth, setIsAuth, setUser} = useContext(AuthContext);
     const[successmes, setSuccessmes] = useState('');
@@ -15,11 +15,7 @@ export default function Login(){
         password: '',
     });
     const[error, setError] = useState('');
-    useEffect(()=>{
-      if(isAuth){
-        router.push('/')
-      }
-    }, [isAuth])
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target
         setForm((prev)=>({
@@ -40,8 +36,8 @@ export default function Login(){
                 setUser(data.update)
                 setForm({ email: '', password: '' })
                 setSuccessmes('Đăng nhập thành công')
-                
-                router.push('/')
+                Cookies.set("User", JSON.stringify(data.update))
+                //router.push('/')
             } else {
                 setError(data.message || "Có lỗi xảy ra, vui lòng thử lại.");
                 alert("Sai mật khẩu")
@@ -53,6 +49,11 @@ export default function Login(){
             
         }
     }
+    useEffect(()=>{
+      if(isAuth){
+        router.push('/')
+      }
+    }, [isAuth])
 
     return (
       

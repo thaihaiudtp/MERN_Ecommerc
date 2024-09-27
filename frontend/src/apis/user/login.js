@@ -18,7 +18,7 @@ export default async function LoginUser(email, password){
         if(data.isLogin === "true"){
             console.log(data);
             console.log(data.update)
-            Cookies.set('User', JSON.stringify(data.update));
+            //Cookies.set('User', JSON.stringify(data.update));
             Cookies.set('AccessToken', data.AccessToken);
             
   

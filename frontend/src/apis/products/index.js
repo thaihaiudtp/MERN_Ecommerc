@@ -7,7 +7,7 @@ export async function Show({title, categoryId}){
     if(categoryId){
         url.searchParams.append('categoryId', categoryId)
     }
-    const data = await fetch(url);
+    const data = await fetch(url)
     let result = await data.json()
     return result.data.products
 }

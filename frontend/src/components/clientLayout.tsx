@@ -1,5 +1,5 @@
 // src/components/ClientLayout.tsx
-"use client"; // Đánh dấu đây là component chạy phía client
+"use client"; 
 
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";

@@ -35,9 +35,9 @@ class UserController {
             } else {
                 const isPassword = await bcrypt.compare(req.body.password, isUser.password)
                 if(isPassword){
-                    const AccessToken = genAccessToken(isUser._id, isUser.role, isUser.name)
+                    const AccessToken = genAccessToken(isUser._id, isUser.role, isUser.name, isUser.email)
                     const RefreshToken = genRefreshToken(isUser._id)
-                    const update = await User.findByIdAndUpdate(isUser._id, {refreshToken: RefreshToken}, {new: true})
+                    const update = await User.findByIdAndUpdate(isUser._id, {refreshToken: RefreshToken}, {new: true}).select("-updatedAt -refreshToken -password -deleted -createdAt")
                     res.cookie('refreshToken', RefreshToken, {httpOnly: true, maxAge: 10*24*60*60*1000, sameSite: 'Lax'})
                     console.log('Refresh Token Set:', RefreshToken);
                     res.set({
@@ -131,6 +131,13 @@ class UserController {
         const user = await User.findOne({passwordResetToken, passwordResetExpires: {$gt: Date.now()}})
         console.log(user)
         if(!user){
+            const expiredUser = await User.findOne({ passwordResetToken: passwordResetToken });
+            if (expiredUser) {
+                // Xóa thông tin reset token nếu đã hết hạn
+                expiredUser.passwordResetToken = undefined;
+                expiredUser.passwordResetExpires = undefined;
+                await expiredUser.save();
+            }
             return res.status(500).json({
                 message: 'Không có user'})
         } else {
