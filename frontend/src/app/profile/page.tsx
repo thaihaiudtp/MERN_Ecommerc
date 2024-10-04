@@ -45,54 +45,46 @@ export default function ProfileUser(){
         return <div>{err}</div>; 
     }
     return(
-    <div>
-        <div className="mt-8">
-        <h1 className="text-lg leading-6 font-medium text-white">
-            User Profile
-        </h1>
-        <p className="mt-1 max-w-2xl text-sm text-white-500">
-            This is some information about the user.
-        </p>
-    </div>
-    <div className="bg-black shadow border mt-14">
-
-    <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
-        <dl className="sm:divide-y sm:divide-gray-200">
-            <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-white-500">
-                    Full name
-                </dt>
-                <dd className="mt-1 text-sm text-white sm:mt-0 sm:col-span-2">
+        <div className="mt-14 pt-10 p-3">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" className="px-6 py-3">
+                        Full name
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                        Email address
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                        Phone number
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                        Address
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     {user?.name}
-                </dd>
-            </div>
-            <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-white-500">
-                    Email address
-                </dt>
-                <dd className="mt-1 text-sm text-white sm:mt-0 sm:col-span-2">
+                </th>
+                <td className="px-6 py-4">
                     {user?.email}
-                </dd>
-            </div>
-            <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-white-500">
-                    Phone number
-                </dt>
-                <dd className="mt-1 text-sm text-white sm:mt-0 sm:col-span-2">
+                </td>
+                <td className="px-6 py-4">
                     {user?.telephone}
-                </dd>
-            </div>
-            <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-white-500">
-                    Address
-                </dt>
-                <dd className="mt-1 text-sm text-white sm:mt-0 sm:col-span-2">
+                </td>
+                <td className="px-6 py-4">
                     {user?.address}
-                </dd>
-            </div>
-        </dl>
+                </td>
+            </tr>
+
+
+
+            </tbody>
+        </table>
+
     </div>
-</div>
-</div>
+
     )
-}
+    }

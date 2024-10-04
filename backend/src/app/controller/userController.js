@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken')
 const CryptoJs = require('crypto-js')
 const {genAccessToken, genRefreshToken} = require('../middleware/jwt')
 const sendMail = require('../ultil/sendMail')
+const mongoose = require('mongoose');
+
 class UserController {
     //ĐĂNG KÝ [POST] /user/register
     async userRegister(req, res){
@@ -222,6 +224,59 @@ class UserController {
                 success: false,
                 message: error.message
             })
+        }
+    }
+    async getCart(req, res){
+        try {
+            const {_id} = req.user
+            const productCart = await User.findById(_id).populate({
+                path: 'cart.product',
+                select: 'title image price'
+            })
+            if(!productCart){
+                return res.status(404).json({ message: 'User not found' });
+            }
+            const getProduct = productCart.cart.map((cartItem) => {
+                const totalPrice = cartItem.product.price * cartItem.quantity
+                return{
+                    _id: cartItem._id,
+                    productId: cartItem.product._id,
+                    title: cartItem.product.title,
+                    image: cartItem.product.image,
+                    price: cartItem.product.price,
+                    color: cartItem.color,
+                    quantity: cartItem.quantity,
+                    totalPrice: totalPrice // Add total price to the response
+                }
+            })
+            res.status(200).json(getProduct)
+        } catch (error) {
+            res.status(500).json({ message: 'Server error', error })
+        }
+    }
+    async deleteProductCart(req, res){
+        try {
+            const {_id} = req.user
+            const {pid}= req.body
+
+            if (!pid) {
+                return res.status(400).json({ message: 'Product IDs are required' });
+            }
+            const idsArray = typeof pid === 'string' ? pid.split(',').map(id => id.trim()) : [pid];
+            const objectIds = idsArray.map(id => new mongoose.Types.ObjectId(id)); 
+            //console.log(objectIds)
+            const rs = await User.findByIdAndUpdate(
+                _id,
+                { $pull: {cart: {_id: {$in: objectIds}}}},
+                {new: true}
+            )
+            if(!rs){
+                return res.status(404).json({ message: 'User not found' });
+            }
+            return res.status(200).json({ message: 'Products removed from cart successfully', cart: rs.cart });
+        } catch (error) {
+            console.error('Error removing product(s) from cart:', error);
+            return res.status(500).json({ message: 'Server error', error: error.message });
         }
     }
 }

@@ -15,4 +15,6 @@ router.delete('/delete', verifyToken.verifyToken, userController.softDelete)
 router.put('/address', verifyToken.verifyToken, userController.updateUserAddress)
 router.put('/cart', verifyToken.verifyToken, userController.updateUserCart)
 router.get('/getall/deleted', verifyToken.verifyTokenAdmin, userController.getAllUserDeleted)
+router.get('/api/cart', verifyToken.verifyToken, userController.getCart)
+router.delete('/api/cart/delete', verifyToken.verifyToken, userController.deleteProductCart)
 module.exports = router

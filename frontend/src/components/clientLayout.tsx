@@ -21,7 +21,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     <div className="flex flex-col min-h-screen">
       {/* Chỉ render Header và Sidebar nếu không phải trang /signup */}
       {isRenderSidebar && <Sidebar />}
-      {!isSignupPage && !isLoginPage && !isCart&&<Header />}
+      {!isSignupPage && !isLoginPage&&<Header />}
       
       
       {children}

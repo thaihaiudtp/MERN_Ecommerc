@@ -4,7 +4,7 @@ const Coupon = require('../model/coupon')
 class OrderController{
     async createOrder(req, res){
         const {_id} = req.user
-        //const {coupon} = req.body
+        
         const userCart = await User.findById(_id).select('cart').populate('cart.product', 'title price')
         if(userCart.cart.length===0){
             return res.status(400).json({message: 'Cart is empty'})
@@ -16,15 +16,10 @@ class OrderController{
         }))
         let total = userCart?.cart?.reduce((sum, el) => el.product.price*el.quantity + sum, 0)
         const createData={products, total, orderBy: _id}
-        //if(coupon){
-        //    const couponData = await Coupon.findById(coupon)
-        //    total = Math.round(total * (1- +couponData.discount/100)/1000)*1000
-        //    createData.total = total
-        //    createData.coupon = coupon
-        //}
         const rs = await Order.create(createData)
         return res.status(200).json({
             message: 'Order created successfully',
+            
             rs: rs
         })
     }
